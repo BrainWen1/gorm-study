@@ -79,11 +79,20 @@ func main() {
 	if err != nil {
 		panic("failed to query users")
 	}
+	fmt.Println(users)
 
 	// 单条记录查询: First、Last、Take, 实际开发中基本是使用 First
 	var user UserModel
-	err = global.DB.First(&user, "name = ?", "Alice").Error
+	err = global.DB.Where("name = ?", "Alice").First(&user).Error
 	if err != nil {
 		panic("failed to query user")
 	}
+	fmt.Println(user)
+
+	// 打印原始 SQL 语句: Debug()
+	err = global.DB.Debug().Where("name = ?", "Alice").First(&user).Error
+	if err != nil {
+		panic("failed to query user")
+	}
+	fmt.Println(user)
 }
