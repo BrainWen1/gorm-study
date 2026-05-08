@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"gorm-study/03-Single-table/advanced_query"
 	"gorm-study/03-Single-table/global"
 
 	"gorm.io/gorm"
@@ -102,7 +103,7 @@ func main() {
 	fmt.Println(user)
 
 	// 更新数据
-	fmt.Println("------------there is a split line------------")
+	/* fmt.Println("------------there is a split line------------")
 	// Save : 根据主键更新，如果主键不存在则插入新记录
 	selectAll()
 	user.Age = 33
@@ -167,6 +168,7 @@ func main() {
 		panic("failed to delete users")
 	}
 	selectAll()
+	*/
 
 	// 软删除 : 需要在模型中添加 DeletedAt 字段
 	// type UserModel struct {
@@ -178,4 +180,36 @@ func main() {
 	// 删除记录时，实际上是将 DeletedAt 字段设置为当前时间，而不是从数据库中删除记录
 	// 查询时，默认会过滤掉已软删除的记录。如果需要查询已软删除的记录，可以使用 Unscoped().Find() 方法
 	// 如果需要永久删除记录，可以使用 Unscoped().Delete() 方法。
+
+	// 高级查询
+	advanced_query.Where_test()
+	advanced_query.Or_test()
+	advanced_query.Not_test()
+	advanced_query.Order_test()
+	advanced_query.Scan_test()
+	advanced_query.Group_test()
+	advanced_query.Distinct_test()
+
+	for i := 1; i <= 3; i++ {
+		advanced_query.Page_test(i, 3)
+	}
+
+	advanced_query.Scope_test()
+
+	// 原生SQL
+	err = global.DB.Raw("select name, age from user_models where age > ?", 30).Scan(&users).Error
+	if err != nil {
+		panic("failed to query users")
+	}
+	fmt.Println(users)
+
+	err = global.DB.Exec("update user_models set age = age + 1 where age > ?", 30).Error
+	if err != nil {
+		panic("failed to update users")
+	}
+	err = global.DB.Raw("select name, age from user_models where age > ?", 30).Scan(&users).Error
+	if err != nil {
+		panic("failed to query users")
+	}
+	fmt.Println(users)
 }
